@@ -43,8 +43,8 @@ func (fs *GrpcFs) GetAttr(name string, ctx *fuse.Context) (*fuse.Attr, fuse.Stat
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	if resp.Status.Code != fuse.OK {
-		return nil, resp.Status.Code
+	if fuse.Status(resp.Status.Code) != fuse.OK {
+		return nil, fuse.Status(resp.Status.Code)
 	}
 	return &fuse.Attr{
 		Ino:       resp.Attr.Ino,
@@ -77,8 +77,8 @@ func (fs *GrpcFs) OpenDir(name string, ctx *fuse.Context) ([]fuse.DirEntry, fuse
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	if resp.Status.Code != fuse.OK {
-		return nil, resp.Status.Code
+	if fuse.Status(resp.Status.Code) != fuse.OK {
+		return nil, fuse.Status(resp.Status.Code)
 	}
 	var c []fuse.DirEntry
 	for _, dir := range resp.Dirs {
@@ -100,8 +100,8 @@ func (fs *GrpcFs) Open(name string, flags uint32, ctx *fuse.Context) (nodefs.Fil
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	if resp.Status.Code != fuse.OK {
-		return nil, resp.Status.Code
+	if fuse.Status(resp.Status.Code) != fuse.OK {
+		return nil, fuse.Status(resp.Status.Code)
 	}
 	return nodefs.NewDataFile(resp.File.Data), fuse.OK
 }
@@ -129,7 +129,7 @@ func (fs *GrpcFs) Chmod(name string, mode uint32, ctx *fuse.Context) fuse.Status
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Chown(name string, uid uint32, gid uint32, ctx *fuse.Context) fuse.Status {
@@ -143,7 +143,7 @@ func (fs *GrpcFs) Chown(name string, uid uint32, gid uint32, ctx *fuse.Context) 
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Utimens(name string, Atime *time.Time, Mtime *time.Time, ctx *fuse.Context) fuse.Status {
@@ -157,20 +157,20 @@ func (fs *GrpcFs) Utimens(name string, Atime *time.Time, Mtime *time.Time, ctx *
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Truncate(name string, size uint64, ctx *fuse.Context) fuse.Status {
 	req := &pb.TruncateRequest{
 		Name:    name,
-		Size_:   size,
+		Size:    size,
 		Context: pbContext(ctx),
 	}
 	resp, err := fs.client.Truncate(context.Background(), req)
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Access(name string, mode uint32, ctx *fuse.Context) fuse.Status {
@@ -183,7 +183,7 @@ func (fs *GrpcFs) Access(name string, mode uint32, ctx *fuse.Context) fuse.Statu
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Link(oldName string, newName string, ctx *fuse.Context) fuse.Status {
@@ -196,7 +196,7 @@ func (fs *GrpcFs) Link(oldName string, newName string, ctx *fuse.Context) fuse.S
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Mkdir(name string, mode uint32, ctx *fuse.Context) fuse.Status {
@@ -209,7 +209,7 @@ func (fs *GrpcFs) Mkdir(name string, mode uint32, ctx *fuse.Context) fuse.Status
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Mknod(name string, mode uint32, dev uint32, ctx *fuse.Context) fuse.Status {
@@ -223,7 +223,7 @@ func (fs *GrpcFs) Mknod(name string, mode uint32, dev uint32, ctx *fuse.Context)
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Rename(oldName string, newName string, ctx *fuse.Context) fuse.Status {
@@ -236,7 +236,7 @@ func (fs *GrpcFs) Rename(oldName string, newName string, ctx *fuse.Context) fuse
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Rmdir(name string, ctx *fuse.Context) fuse.Status {
@@ -248,7 +248,7 @@ func (fs *GrpcFs) Rmdir(name string, ctx *fuse.Context) fuse.Status {
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Unlink(name string, ctx *fuse.Context) fuse.Status {
@@ -260,7 +260,7 @@ func (fs *GrpcFs) Unlink(name string, ctx *fuse.Context) fuse.Status {
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) GetXAttr(name string, attribute string, ctx *fuse.Context) ([]byte, fuse.Status) {
@@ -273,7 +273,7 @@ func (fs *GrpcFs) GetXAttr(name string, attribute string, ctx *fuse.Context) ([]
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	return resp.Data, resp.Status.Code
+	return resp.Data, fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) ListXAttr(name string, ctx *fuse.Context) ([]string, fuse.Status) {
@@ -285,7 +285,7 @@ func (fs *GrpcFs) ListXAttr(name string, ctx *fuse.Context) ([]string, fuse.Stat
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	return resp.Attributes, resp.Status.Code
+	return resp.Attributes, fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) RemoveXAttr(name string, attr string, ctx *fuse.Context) fuse.Status {
@@ -298,7 +298,7 @@ func (fs *GrpcFs) RemoveXAttr(name string, attr string, ctx *fuse.Context) fuse.
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) SetXAttr(name string, attr string, data []byte, flags int, ctx *fuse.Context) fuse.Status {
@@ -306,14 +306,14 @@ func (fs *GrpcFs) SetXAttr(name string, attr string, data []byte, flags int, ctx
 		Name:      name,
 		Attribute: attr,
 		Data:      data,
-		Flags:     flags,
+		Flags:     int32(flags),
 		Context:   pbContext(ctx),
 	}
 	resp, err := fs.client.SetXAttr(context.Background(), req)
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Create(name string, flags uint32, mode uint32, ctx *fuse.Context) (nodefs.File, fuse.Status) {
@@ -327,7 +327,7 @@ func (fs *GrpcFs) Create(name string, flags uint32, mode uint32, ctx *fuse.Conte
 	if err != nil {
 		return nil, fuse.ToStatus(err)
 	}
-	return nodefs.NewDataFile(resp.File.Data), resp.Status.Code
+	return nodefs.NewDataFile(resp.File.Data), fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Symlink(value string, linkName string, ctx *fuse.Context) fuse.Status {
@@ -340,7 +340,7 @@ func (fs *GrpcFs) Symlink(value string, linkName string, ctx *fuse.Context) fuse
 	if err != nil {
 		return fuse.ToStatus(err)
 	}
-	return resp.Status.Code
+	return fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) Readlink(name string, ctx *fuse.Context) (string, fuse.Status) {
@@ -352,7 +352,7 @@ func (fs *GrpcFs) Readlink(name string, ctx *fuse.Context) (string, fuse.Status)
 	if err != nil {
 		return "", fuse.ToStatus(err)
 	}
-	return resp.Value, resp.Status.Code
+	return resp.Value, fuse.Status(resp.Status.Code)
 }
 
 func (fs *GrpcFs) StatFs(name string) *fuse.StatfsOut {

@@ -37,7 +37,7 @@ const (
 	ENOENT = Status(syscall.ENOENT)
 
 	// ENOSYS Function not implemented
-	ENOSYS = Status(syscall.ENOSYS)
+	ENOSYS = Status(38)
 
 	// ENODATA No data available
 	ENODATA = Status(syscall.ENODATA)

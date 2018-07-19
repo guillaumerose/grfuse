@@ -5,12 +5,11 @@ import (
 
 	"github.com/LK4D4/grfuse/pb"
 	"github.com/hanwen/go-fuse/fuse"
-	"github.com/hanwen/go-fuse/fuse/pathfs"
 	"golang.org/x/net/context"
 )
 
 type fuseServer struct {
-	fs pathfs.FileSystem
+	fs FileSystem
 }
 
 func fuseContext(gctx *pb.Context) *fuse.Context {
@@ -29,7 +28,7 @@ func fuseContext(gctx *pb.Context) *fuse.Context {
 	return ctx
 }
 
-func New(fs pathfs.FileSystem) pb.PathFSServer {
+func New(fs FileSystem) pb.PathFSServer {
 	return &fuseServer{fs: fs}
 }
 
@@ -54,7 +53,7 @@ func (s *fuseServer) GetAttr(ctx context.Context, r *pb.GetAttrRequest) (*pb.Get
 	if code == fuse.OK {
 		resp.Attr = &pb.Attr{
 			Ino:       attr.Ino,
-			SizeAttr:  attr.Size,
+			SizeAttr:  attr.SizeAttr,
 			Blocks:    attr.Blocks,
 			Atime:     attr.Atime,
 			Mtime:     attr.Mtime,
@@ -64,10 +63,10 @@ func (s *fuseServer) GetAttr(ctx context.Context, r *pb.GetAttrRequest) (*pb.Get
 			Ctimensec: attr.Ctimensec,
 			Mode:      attr.Mode,
 			Nlink:     attr.Nlink,
-			Owner: &pb.Owner{
-				Uid: attr.Owner.Uid,
-				Gid: attr.Owner.Gid,
-			},
+			//Owner: &pb.Owner{
+			//	Uid: attr.Owner.Uid,
+			//	Gid: attr.Owner.Gid,
+			//},
 			Rdev:    attr.Rdev,
 			Blksize: attr.Blksize,
 			Padding: attr.Padding,
@@ -180,20 +179,7 @@ func (s *fuseServer) Open(ctx context.Context, r *pb.OpenRequest) (*pb.OpenRespo
 	if code != fuse.OK {
 		return resp, nil
 	}
-	attr := &fuse.Attr{}
-	if code := f.GetAttr(attr); code != fuse.OK {
-		return &pb.OpenResponse{
-			Status: &pb.Status{Code: int32(code)},
-		}, nil
-	}
-	buf := make([]byte, attr.Size)
-	readResult, code := f.Read(buf, 0)
-	if code != fuse.OK {
-		return &pb.OpenResponse{
-			Status: &pb.Status{Code: int32(code)},
-		}, nil
-	}
-	buf, code = readResult.Bytes(buf)
+	buf, code := f.Read(0)
 	if code != fuse.OK {
 		return &pb.OpenResponse{
 			Status: &pb.Status{Code: int32(code)},

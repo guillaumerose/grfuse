@@ -11,46 +11,7 @@ import (
 
 	"github.com/LK4D4/grfuse/pb"
 	"github.com/LK4D4/grfuse/server"
-	"github.com/hanwen/go-fuse/fuse"
-	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"github.com/hanwen/go-fuse/fuse/pathfs"
 )
-
-type HelloFs struct {
-	pathfs.FileSystem
-}
-
-func (me *HelloFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
-	switch name {
-	case "file.txt":
-		return &fuse.Attr{
-			Mode: fuse.S_IFREG | 0644, Size: uint64(len(name)),
-		}, fuse.OK
-	case "":
-		return &fuse.Attr{
-			Mode: fuse.S_IFDIR | 0755,
-		}, fuse.OK
-	}
-	return nil, fuse.ENOENT
-}
-
-func (me *HelloFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry, code fuse.Status) {
-	if name == "" {
-		c = []fuse.DirEntry{{Name: "file.txt", Mode: fuse.S_IFREG}}
-		return c, fuse.OK
-	}
-	return nil, fuse.ENOENT
-}
-
-func (me *HelloFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	if name != "file.txt" {
-		return nil, fuse.ENOENT
-	}
-	if flags&fuse.O_ANYWRITE != 0 {
-		return nil, fuse.EPERM
-	}
-	return nodefs.NewDataFile([]byte(name)), fuse.OK
-}
 
 func main() {
 	if len(os.Args) != 2 {
@@ -59,7 +20,7 @@ func main() {
 	}
 	root := os.Args[1]
 
-	loop := pathfs.NewLoopbackFileSystem("/Users/guillaumerose/tmp")
+	loop := server.NewLoopbackFileSystem("C:\\Users\\admin")
 	//hfs := &HelloFs{FileSystem: pathfs.NewDefaultFileSystem()}
 
 	l, err := net.Listen("tcp", ":50000")

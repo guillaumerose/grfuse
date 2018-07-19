@@ -29,6 +29,8 @@ type Attr struct {
 	Owner
 	Rdev   uint32
 	Flags_ uint32 //  OS X
+	Blksize uint32
+	Padding uint32
 }
 
 const (

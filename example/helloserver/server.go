@@ -59,26 +59,20 @@ func main() {
 	}
 	root := os.Args[1]
 
-	hfs := &HelloFs{FileSystem: pathfs.NewDefaultFileSystem()}
+	loop := pathfs.NewLoopbackFileSystem("/Users/guillaumerose/tmp")
+	//hfs := &HelloFs{FileSystem: pathfs.NewDefaultFileSystem()}
 
-	nfs := pathfs.NewPathNodeFs(hfs, nil)
-	fuseSrv, _, err := nodefs.MountRoot(root, nfs.Root(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	go fuseSrv.Serve()
-	l, err := net.Listen("tcp", "127.0.0.1:50000")
+	l, err := net.Listen("tcp", ":50000")
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterPathFSServer(s, server.New(hfs))
+	pb.RegisterPathFSServer(s, server.New(loop))
 	go s.Serve(l)
 	log.Printf("Listen on %s for dir %s", l.Addr(), root)
 	sigCh := make(chan os.Signal)
 	signal.Notify(sigCh, os.Interrupt)
 	for range sigCh {
-		fuseSrv.Unmount()
 		s.Stop()
 		os.Exit(0)
 	}

@@ -21,7 +21,7 @@ func main() {
 	root := os.Args[1]
 
 	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial("192.168.65.2:50000", dialOpts...)
+	conn, err := grpc.Dial("host.docker.internal:50000", dialOpts...)
 	if err != nil {
 		log.Fatal(err)
 	}

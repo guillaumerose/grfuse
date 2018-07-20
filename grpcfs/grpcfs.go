@@ -58,10 +58,10 @@ func (fs *GrpcFs) GetAttr(name string, ctx *fuse.Context) (*fuse.Attr, fuse.Stat
 		Ctimensec: resp.Attr.Ctimensec,
 		Mode:      resp.Attr.Mode,
 		Nlink:     resp.Attr.Nlink,
-		Owner: fuse.Owner{
-			Uid: resp.Attr.Owner.Uid,
-			Gid: resp.Attr.Owner.Gid,
-		},
+		//Owner: fuse.Owner{
+		//	Uid: resp.Attr.Owner.Uid,
+		//	Gid: resp.Attr.Owner.Gid,
+		//},
 		Rdev:    resp.Attr.Rdev,
 		Blksize: resp.Attr.Blksize,
 		Padding: resp.Attr.Padding,
